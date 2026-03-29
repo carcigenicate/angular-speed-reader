@@ -5,10 +5,17 @@
     "packageManager": "npm"
   },
   "newProjectRoot": "projects",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
   "projects": {
     "speed-reader": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -25,7 +32,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
             ]
           },
           "configurations": {

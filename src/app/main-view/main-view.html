@@ -1,4 +1,86 @@
-<div>
+<p-dialog
+  [(visible)]="importDialogShowing"
+  [contentStyle]="{ width: '50vw' }"
+>
+  <ng-template #content>
+    <div class="d-flex flex-column gap-3">
+      <label>Import From File</label>
+      <div class="d-flex justify-content-center">
+        <app-load-from-file
+          (textImported)="loadTextFromDialog($event)"
+        />
+      </div>
+
+      <p-divider>Or</p-divider>
+
+      <div class="d-flex flex-column gap-1">
+        <textarea
+          #textArea
+          pTextarea
+          [rows]="10"
+        ></textarea>
+
+        <p-button
+          label="Load"
+          size="small"
+          (onClick)="loadTextFromDialog(textArea.value)"
+        />
+      </div>
+
+    </div>
+  </ng-template>
+</p-dialog>
+
+<div class="d-flex flex-column align-items-center justify-content-center">
+  <p-toolbar
+    class="w-100 even-toolbar"
+  >
+    <ng-template #start>
+      <div class="d-flex gap-3 align-items-center">
+        <p-slider
+          [min]="minWpm"
+          [max]="maxWpm"
+          [(ngModel)]="wordsPerMinute"
+          [style.width.rem]="10"
+        />
+
+        <span>
+          <p-input-number
+            size="small"
+            suffix=" WPM"
+            [(ngModel)]="wordsPerMinute"
+            [min]="minWpm"
+            [max]="maxWpm"
+          />
+        </span>
+      </div>
+
+    </ng-template>
+    <ng-template #center>
+      <div>
+        <p-button
+          label="Load"
+          (onClick)="importDialogShowing = true"
+        />
+      </div>
+    </ng-template>
+    <ng-template #end>
+      <div>
+        @if (isPaused) {
+          <p-button
+            icon="pi pi-play"
+            (onClick)="resume()"
+          />
+        } @else {
+          <p-button
+            icon="pi pi-pause"
+            (onClick)="pause()"
+          />
+        }
+      </div>
+    </ng-template>
+  </p-toolbar>
+
   <app-word-canvas
     [width]="1800"
     [height]="300"

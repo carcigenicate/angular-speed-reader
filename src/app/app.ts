@@ -7,7 +7,7 @@ import { MainView } from './main-view/main-view';
   selector: 'app-root',
   imports: [ RouterOutlet, WordCanvas, MainView ],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.scss'
 })
 export class App {
 

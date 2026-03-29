@@ -69,22 +69,19 @@ export class WordCanvas implements OnInit, AfterViewInit {
 
     const secondHalf = word.slice(focusIndex + 1);
 
+    const halfWidth = this.width() / 2;
     const halfHeight = this.height() / 2;
 
-    const wordMetrics = ctx.measureText(word);
-    let x = (this.width() - wordMetrics.width) / 2;
-    ctx.fillStyle = this.normalTextStyle();
-    ctx.fillText(firstHalf, x, halfHeight);
+    const focusStartX = halfWidth - (focusMetrics.width / 2);
 
-    x += firstHalfMetrics.width + this.letterSpacing();
+    ctx.fillStyle = this.normalTextStyle();
+    ctx.fillText(firstHalf, focusStartX - firstHalfMetrics.width - this.letterSpacing(), halfHeight);
 
     ctx.fillStyle = this.focusTextStyle();
-    ctx.fillText(focusLetter, x, halfHeight);
-
-    x += focusMetrics.width + this.letterSpacing();
+    ctx.fillText(focusLetter, focusStartX, halfHeight);
 
     ctx.fillStyle = this.normalTextStyle();
-    ctx.fillText(secondHalf, x, halfHeight);
+    ctx.fillText(secondHalf, focusStartX + focusMetrics.width + this.letterSpacing(), halfHeight);
 
     ctx.restore();
   }

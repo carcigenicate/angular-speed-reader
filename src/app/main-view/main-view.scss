@@ -1,0 +1,17 @@
+:host ::ng-deep .even-toolbar.p-toolbar  {
+  & > [class^=p-toolbar-] {
+    flex: 1;
+    display: flex;
+  }
+
+  & > .p-toolbar-start {
+    justify-content: start;
+  }
+
+  & > .p-toolbar-center {
+    justify-content: center;
+  }
+  & > .p-toolbar-end {
+    justify-content: end;
+  }
+}
