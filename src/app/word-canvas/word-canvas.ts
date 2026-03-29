@@ -6,7 +6,7 @@ const MAX_FOCUS_INDEX = 4;
   selector: 'app-word-canvas',
   imports: [],
   templateUrl: './word-canvas.html',
-  styleUrl: './word-canvas.css',
+  styleUrl: './word-canvas.scss',
 })
 export class WordCanvas implements OnInit, AfterViewInit {
   word = input.required<string>()
