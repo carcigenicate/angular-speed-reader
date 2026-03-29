@@ -34,7 +34,7 @@ export class WordCanvas implements OnInit, AfterViewInit {
     let index = 0;
 
     if (length > 2) {
-      index = Math.floor(length / 2);
+      index = Math.floor(length / 2) - 1;
     }
 
     return Math.min(MAX_FOCUS_INDEX, index);
