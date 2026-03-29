@@ -11,6 +11,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Dialog } from 'primeng/dialog';
 import { Divider } from 'primeng/divider';
 import { Textarea } from 'primeng/textarea';
+import { ProgressBar } from 'primeng/progressbar';
 
 const SAMPLE_TEXT = `
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam condimentum vel nisl posuere tincidunt. Mauris iaculis nisl
@@ -38,7 +39,8 @@ const SAMPLE_TEXT = `
     InputNumber,
     Dialog,
     Divider,
-    Textarea
+    Textarea,
+    ProgressBar
   ],
   templateUrl: './main-view.html',
   styleUrl: './main-view.scss',
@@ -54,7 +56,7 @@ export class MainView implements OnInit {
   wordsPerMinute: Signal<number> = signal<number>(400);
   advanceDelay: Signal<number>;
 
-  isPaused: boolean = false;
+  isPaused: boolean = true;
 
   importDialogShowing: boolean = false;
 
@@ -77,11 +79,16 @@ export class MainView implements OnInit {
     this.currentWord.set(currentWord);
   }
 
+  restart() {
+    this.setCurrentWordByIndex(0);
+    this.resume();
+  }
+
   advance() {
     this.setCurrentWordByIndex(this.currentWordIndex + 1);
 
-    if (this.currentWordIndex > this.words.length - 1) {
-      this.setCurrentWordByIndex(0);
+    if (this.currentWordIndex >= this.words.length - 1) {
+      this.pause();
     }
   }
 
@@ -95,18 +102,50 @@ export class MainView implements OnInit {
     this.setCurrentWordByIndex(0);
   }
 
-  resume() {
-    const loopF = () => {
-      this.advance();
-      if (!this.isPaused) {
-        setTimeout(() => {
-          loopF();
-        }, this.advanceDelay());
+  private findFullWidthParent(clickTarget: HTMLElement): HTMLElement | null {
+    if (clickTarget.classList.contains('p-progressbar')) {
+      return clickTarget;
+    } else {
+      const parent = clickTarget.parentElement;
+      if (parent) {
+        return this.findFullWidthParent(parent);
+      } else {
+        return null;
       }
     }
+  }
 
-    this.isPaused = false;
-    loopF();
+  progressBarClicked(event: MouseEvent) {
+    // TODO: Will need to adjust if the left of the progress bar changes
+    const clientClickX = event.x;
+
+    const parent = this.findFullWidthParent(event.target as HTMLElement);
+    if (parent) {
+      const barBB = parent.getBoundingClientRect();
+
+      const clickPerc = clientClickX / barBB.width;
+      const index = Math.floor(this.words.length * clickPerc);
+
+      this.setCurrentWordByIndex(index);
+    }
+
+  }
+
+  resume() {
+    if (this.isPaused) {
+      const loopF = () => {
+        if (!this.isPaused) {
+          this.advance();
+
+          setTimeout(() => {
+            loopF();
+          }, this.advanceDelay());
+        }
+      }
+
+      this.isPaused = false;
+      loopF();
+    }
   }
 
   pause() {

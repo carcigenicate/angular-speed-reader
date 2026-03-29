@@ -34,6 +34,7 @@
 <div class="d-flex flex-column align-items-center justify-content-center">
   <p-toolbar
     class="w-100 even-toolbar"
+    [style.border-radius.px]="0"
   >
     <ng-template #start>
       <div class="d-flex gap-3 align-items-center">
@@ -65,21 +66,37 @@
       </div>
     </ng-template>
     <ng-template #end>
-      <div>
-        @if (isPaused) {
-          <p-button
-            icon="pi pi-play"
-            (onClick)="resume()"
-          />
-        } @else {
-          <p-button
-            icon="pi pi-pause"
-            (onClick)="pause()"
-          />
-        }
+      <div class="d-flex gap-2">
+        <p-button
+          icon="pi pi-replay"
+          (onClick)="restart()"
+        />
+        <div>
+          @if (isPaused) {
+            <p-button
+              icon="pi pi-play"
+              (onClick)="resume()"
+            />
+          } @else {
+            <p-button
+              icon="pi pi-pause"
+              (onClick)="pause()"
+            />
+          }
+        </div>
       </div>
+
     </ng-template>
   </p-toolbar>
+
+  <p-progress-bar
+    class="w-100 fast-update-progress-bar"
+    [value]="(currentWordIndex / (words.length - 1)) * 100"
+    [showValue]="false"
+    [style.border-radius.px]="0"
+    [style.height.rem]="0.5"
+    (click)="progressBarClicked($event)"
+  />
 
   <app-word-canvas
     [width]="1800"

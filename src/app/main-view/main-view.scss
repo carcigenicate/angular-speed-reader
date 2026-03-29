@@ -15,3 +15,7 @@
     justify-content: end;
   }
 }
+
+:host .fast-update-progress-bar ::ng-deep .p-progressbar-value {
+  transition: width 500ms;
+}
