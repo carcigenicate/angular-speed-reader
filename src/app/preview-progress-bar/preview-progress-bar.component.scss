@@ -1,0 +1,14 @@
+:host .fast-update-progress-bar ::ng-deep .p-progressbar-value {
+  transition: width 500ms;
+}
+
+.preview-card {
+  position: absolute;
+  z-index: 10;
+
+  padding: 2rem;
+
+  border-radius: 1rem;
+
+  background-color: var(--p-surface-900);
+}

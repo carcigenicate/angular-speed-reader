@@ -1,0 +1,34 @@
+<div class="position-relative">
+  <p-progress-bar
+    class="w-100 fast-update-progress-bar"
+    [value]="(currentWordIndex() / (words().length - 1)) * 100"
+    [showValue]="false"
+    [style.border-radius.px]="0"
+    [style.height.px]="height()"
+    (click)="progressBarClicked($event)"
+    (mousemove)="progressBarMousedOver($event)"
+    (mouseleave)="progressBarMousedLeave($event)"
+  />
+
+  <div #previewContainer>
+
+  </div>
+
+  @let preview = wordPreview();
+  @if (preview) {
+<!--    <p-card-->
+
+<!--      class="preview-card"-->
+<!--      [style.top.px]="preview.y"-->
+<!--      [style.left.px]="preview.x"-->
+<!--    >-->
+<!--      <ng-template #content>-->
+<!--        {{ preview.word }}-->
+<!--      </ng-template>-->
+<!--    </p-card>-->
+  }
+</div>
+
+
+
+

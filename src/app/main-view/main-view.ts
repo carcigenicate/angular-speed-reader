@@ -12,6 +12,7 @@ import { Dialog } from 'primeng/dialog';
 import { Divider } from 'primeng/divider';
 import { Textarea } from 'primeng/textarea';
 import { ProgressBar } from 'primeng/progressbar';
+import { PreviewProgressBar } from '../preview-progress-bar/preview-progress-bar.component';
 
 const SAMPLE_TEXT = `
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam condimentum vel nisl posuere tincidunt. Mauris iaculis nisl
@@ -40,7 +41,7 @@ const SAMPLE_TEXT = `
     Dialog,
     Divider,
     Textarea,
-    ProgressBar
+    PreviewProgressBar
   ],
   templateUrl: './main-view.html',
   styleUrl: './main-view.scss',
@@ -48,9 +49,13 @@ const SAMPLE_TEXT = `
 export class MainView implements OnInit {
   words: string[] = [];
   currentWordIndex: number = 0;
+  whitespaceCombinedText: string = '';
 
   minWpm: number = 150;
   maxWpm: number = 900;
+
+  canvasWidth: number = 1800;
+  canvasHeight: number = 300;
 
   currentWord = signal<string>('');
   wordsPerMinute: Signal<number> = signal<number>(400);
@@ -98,37 +103,9 @@ export class MainView implements OnInit {
   }
 
   loadText(text: string) {
-    this.words = text.split(/\s/).filter((word) => word.length > 0);
+    this.whitespaceCombinedText = text.replace(/\s+/g, ' ');
+    this.words = this.whitespaceCombinedText.split(/\s/).filter((word) => word.length > 0);
     this.setCurrentWordByIndex(0);
-  }
-
-  private findFullWidthParent(clickTarget: HTMLElement): HTMLElement | null {
-    if (clickTarget.classList.contains('p-progressbar')) {
-      return clickTarget;
-    } else {
-      const parent = clickTarget.parentElement;
-      if (parent) {
-        return this.findFullWidthParent(parent);
-      } else {
-        return null;
-      }
-    }
-  }
-
-  progressBarClicked(event: MouseEvent) {
-    // TODO: Will need to adjust if the left of the progress bar changes
-    const clientClickX = event.x;
-
-    const parent = this.findFullWidthParent(event.target as HTMLElement);
-    if (parent) {
-      const barBB = parent.getBoundingClientRect();
-
-      const clickPerc = clientClickX / barBB.width;
-      const index = Math.floor(this.words.length * clickPerc);
-
-      this.setCurrentWordByIndex(index);
-    }
-
   }
 
   resume() {

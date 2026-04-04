@@ -34,7 +34,7 @@ export class WordCanvas implements OnInit, AfterViewInit {
     let index = 0;
 
     if (length > 2) {
-      index = Math.floor(length / 2) - 1;
+      index = Math.floor(length / 2);
     }
 
     return Math.min(MAX_FOCUS_INDEX, index);
@@ -55,6 +55,7 @@ export class WordCanvas implements OnInit, AfterViewInit {
 
     ctx.font = this.font();
     ctx.textBaseline = 'middle';
+    ctx.letterSpacing = `${this.letterSpacing()}px`;
 
     ctx.fillStyle = this.backgroundStyle();
     ctx.fillRect(0, 0, this.width(), this.height());

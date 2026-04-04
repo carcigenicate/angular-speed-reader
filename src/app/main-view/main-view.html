@@ -89,19 +89,20 @@
     </ng-template>
   </p-toolbar>
 
-  <p-progress-bar
-    class="w-100 fast-update-progress-bar"
-    [value]="(currentWordIndex / (words.length - 1)) * 100"
-    [showValue]="false"
-    [style.border-radius.px]="0"
-    [style.height.rem]="0.5"
-    (click)="progressBarClicked($event)"
+  <app-preview-progress-bar
+    class="w-100"
+    textColor="white"
+    [words]="words"
+    [height]="35"
+    [currentWordIndex]="currentWordIndex"
+    (currentWordIndexChange)="setCurrentWordByIndex($event)"
   />
 
   <app-word-canvas
-    [width]="1800"
-    [height]="300"
+    [width]="canvasWidth"
+    [height]="canvasHeight"
     font="bold 200px monospace"
+    [letterSpacing]="0"
 
     normalTextStyle="white"
     backgroundStyle="black"
