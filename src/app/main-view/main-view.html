@@ -37,24 +37,6 @@
     [style.border-radius.px]="0"
   >
     <ng-template #start>
-      <div class="d-flex gap-3 align-items-center">
-        <p-slider
-          [min]="minWpm"
-          [max]="maxWpm"
-          [(ngModel)]="wordsPerMinute"
-          [style.width.rem]="10"
-        />
-
-        <span>
-          <p-input-number
-            size="small"
-            suffix=" WPM"
-            [(ngModel)]="wordsPerMinute"
-            [min]="minWpm"
-            [max]="maxWpm"
-          />
-        </span>
-      </div>
 
     </ng-template>
     <ng-template #center>
@@ -91,7 +73,7 @@
 
   <app-preview-progress-bar
     class="w-100"
-    textColor="white"
+    [textColor]="textColor"
     [words]="words"
     [height]="35"
     [currentWordIndex]="currentWordIndex"
@@ -102,10 +84,66 @@
     [width]="canvasWidth"
     [height]="canvasHeight"
     font="bold 200px monospace"
-    [letterSpacing]="0"
-
-    normalTextStyle="white"
+    [letterSpacing]="letterSpacing()"
+    [normalTextStyle]="textColor"
     backgroundStyle="black"
     [word]="currentWord()"
   />
+
+  <p-divider />
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-4 col-12">
+        <table
+          class="w-100"
+
+        >
+          <tbody>
+          <tr>
+            <td>Speed</td>
+            <td>
+              <p-slider
+                [min]="minWpm"
+                [max]="maxWpm"
+                [(ngModel)]="wordsPerMinute"
+                [style.width.rem]="10"
+              />
+            </td>
+            <td>
+              <p-input-number
+                size="small"
+                suffix=" WPM"
+                [(ngModel)]="wordsPerMinute"
+                [min]="minWpm"
+                [max]="maxWpm"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>Spacing</td>
+            <td>
+              <p-slider
+                [min]="minSpacing"
+                [max]="maxSpacing"
+                [(ngModel)]="letterSpacing"
+                [style.width.rem]="10"
+              />
+            </td>
+            <td>
+              <p-input-number
+                size="small"
+                suffix=" px"
+                [(ngModel)]="letterSpacing"
+                [min]="minSpacing"
+                [max]="maxSpacing"
+              />
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>

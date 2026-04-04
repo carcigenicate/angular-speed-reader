@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, Signal, signal } from '@angular/core';
+import { Component, computed, ElementRef, HostBinding, OnInit, Signal, signal } from '@angular/core';
 import { WordCanvas } from '../word-canvas/word-canvas';
 import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
@@ -13,17 +13,28 @@ import { Divider } from 'primeng/divider';
 import { Textarea } from 'primeng/textarea';
 import { ProgressBar } from 'primeng/progressbar';
 import { PreviewProgressBar } from '../preview-progress-bar/preview-progress-bar.component';
+import { Accordion, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 
 const SAMPLE_TEXT = `
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam condimentum vel nisl posuere tincidunt. Mauris iaculis nisl
-    ac felis semper fringilla. Aliquam feugiat nulla erat, eget efficitur mauris iaculis vitae. Sed fringilla, ex fringilla
-    hendrerit auctor, leo mauris consectetur arcu, et sagittis lacus magna vitae purus. Vestibulum nec tortor a libero sagittis
-    ultrices. Praesent eu turpis non libero rutrum consectetur. Integer dictum tortor non tellus porta posuere. Aenean vel
-    enim et tellus placerat semper in eu massa. Curabitur ornare mi vel nunc laoreet elementum. Suspendisse vel est metus. Nulla
-    molestie vehicula turpis, id cursus ante condimentum at. Integer laoreet at lectus vitae commodo. Mauris et nibh ut ligula
-    fermentum pellentesque. Fusce condimentum dolor ullamcorper sagittis scelerisque. Nulla nunc enim, laoreet at mauris faucibus,
-    lacinia cursus lacus. Sed arcu erat, scelerisque quis rhoncus tincidunt, placerat sed sapien. Orci varius natoque penatibus
-    et magnis dis parturient montes, nascetur ridiculus mus.
+dSo I posted here a few days ago asking for feedback on something I built. Got some honest responses that basically said "this already exists" and "just use Copilot for this." Which... fair enough.
+
+Quick context on what I built: it runs pytest on your project, tries to fix what's failing, checks if the fix actually worked, and rolls back if it made things worse. Basically automating the fix → run → verify loop that I kept doing manually.
+
+The feedback made me realize something I probably should have figured out earlier — developers don't actually want a bot modifying their files. They want suggestions. They want control. Makes complete sense in hindsight.
+
+So now I'm wondering if I built the right thing in the wrong place.
+
+What if instead of running this as a developer tool, it lived inside CI/CD? Like when your GitHub Actions pipeline fails — instead of just showing a red X and making you go debug it — something automatically tries to fix it and opens a PR. You still review everything. Nothing gets merged without you. But the boring "find the error, apply the fix, run tests again" part is handled automatically.
+
+I genuinely don't know if this is a good idea or if I'm just looking for a reason to not throw away a month of work
+
+Few honest questions for anyone who's dealt with this:
+
+Does your CI pipeline failing actually drive you crazy or do you just fix it and move on? Is there already something that does this that I'm missing? Would you trust an automated PR from a tool like this or would it feel like more noise?
+
+Not trying to sell anything. Just trying to figure out if there's something real here or if I should cut my losses and move on to the next thing.
+
+Honest takes welcome
 `;
 
 @Component({
@@ -32,16 +43,14 @@ const SAMPLE_TEXT = `
     WordCanvas,
     Toolbar,
     Button,
-    FileUpload,
     LoadFromFile,
     Slider,
     FormsModule,
-    InputText,
     InputNumber,
     Dialog,
     Divider,
     Textarea,
-    PreviewProgressBar
+    PreviewProgressBar,
   ],
   templateUrl: './main-view.html',
   styleUrl: './main-view.scss',
@@ -54,18 +63,26 @@ export class MainView implements OnInit {
   minWpm: number = 150;
   maxWpm: number = 900;
 
+  minSpacing: number = -40;
+  maxSpacing: number = 40;
+
   canvasWidth: number = 1800;
   canvasHeight: number = 300;
 
   currentWord = signal<string>('');
   wordsPerMinute: Signal<number> = signal<number>(400);
+  letterSpacing: Signal<number> = signal<number>(0);
   advanceDelay: Signal<number>;
 
   isPaused: boolean = true;
 
   importDialogShowing: boolean = false;
 
-  constructor() {
+  textColor!: string;
+
+  constructor(
+    private host: ElementRef,
+  ) {
     this.advanceDelay = computed(() => {
       const wpm = this.wordsPerMinute();
       const delay = Math.floor(60_000 / wpm);
@@ -74,6 +91,8 @@ export class MainView implements OnInit {
   }
 
   ngOnInit() {
+    this.textColor = getComputedStyle(this.host.nativeElement).getPropertyValue('--p-text-color');
+
     this.loadText(SAMPLE_TEXT);
     this.resume();
   }
