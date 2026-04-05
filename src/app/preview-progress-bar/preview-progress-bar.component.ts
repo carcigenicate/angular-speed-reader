@@ -6,7 +6,7 @@ import {
   input,
   model, Renderer2,
   Signal,
-  signal, viewChild, ViewContainerRef,
+  signal, viewChild,
   WritableSignal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -26,6 +26,7 @@ export class PreviewProgressBar {
 
   words = input.required<string[]>();
   textColor = input.required<string>();
+  dialogBackgroundColor = input.required<string>();
   fontFamily = input<string>(`monospace`);
 
   height = input.required<number>();
@@ -35,8 +36,6 @@ export class PreviewProgressBar {
 
   width: WritableSignal<number> = signal<number>(0);
   fontSizePx: Signal<number>;
-
-  wordPreview = signal<{ word: string, x: number, y: number, parentBB: DOMRect } | null>(null);
 
   previewCardContainer = viewChild.required<ElementRef<HTMLDivElement>>('previewContainer');
 
@@ -116,15 +115,17 @@ export class PreviewProgressBar {
   }
 
   progressBarMousedOver(event: MouseEvent) {
+    const allWords = this.words();
     const parent = this.findFullWidthParent(event.target as HTMLElement);
-    if (parent) {
+    if (parent && allWords.length > 0) {
       const barBB = parent.getBoundingClientRect();
       const index = this.calculateWordIndexAt(barBB, event.clientX);
-      const words = this.words().slice(index, index + 10).join(' ');
+      const words = allWords.slice(index, index + 10).join(' ');
 
       const tooltip: HTMLSpanElement = this.renderer.createElement('span');
       this.renderer.addClass(tooltip, 'preview-card');
       this.renderer.setStyle(tooltip, 'color', this.textColor());
+      this.renderer.setStyle(tooltip, 'background-color', this.dialogBackgroundColor());
       tooltip.innerText = words;
 
       const container = this.previewCardContainer().nativeElement;

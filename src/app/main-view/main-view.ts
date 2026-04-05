@@ -62,6 +62,7 @@ export class MainView implements OnInit {
   importDialogShowing: boolean = false;
 
   textColor!: string;
+  backgroundColor!: string;
 
   focusTypeOptions: { label: string, value: FocusType }[] = [
     { label: 'Center', value: 'center' },
@@ -80,6 +81,7 @@ export class MainView implements OnInit {
 
   ngOnInit() {
     this.textColor = getComputedStyle(this.host.nativeElement).getPropertyValue('--p-text-color');
+    this.backgroundColor = getComputedStyle(this.host.nativeElement).getPropertyValue('--p-overlay-modal-background');
 
     this.loadText(SAMPLE_TEXT);
     this.resume();

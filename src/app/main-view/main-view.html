@@ -75,6 +75,7 @@
   <app-preview-progress-bar
     class="w-100"
     [textColor]="textColor"
+    [dialogBackgroundColor]="backgroundColor"
     [words]="words"
     [height]="35"
     [currentWordIndex]="currentWordIndex"
@@ -87,7 +88,7 @@
     fontFamily="monospace"
     [letterSpacing]="letterSpacing()"
     [normalTextStyle]="textColor"
-    backgroundStyle="black"
+    [backgroundStyle]="backgroundColor"
     [word]="currentWord()"
     [focusType]="focusType()"
   />
