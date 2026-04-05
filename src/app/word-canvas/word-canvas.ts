@@ -7,7 +7,6 @@ import {
   input,
   OnInit,
   Signal,
-  signal,
   viewChild
 } from '@angular/core';
 

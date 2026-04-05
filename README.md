@@ -1,6 +1,14 @@
 # SpeedReader
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.5.
+This is an Angular app that uses Rapid Serial Visual Presentation (RSVP) to allow reading at higher-than-normal speeds.
+
+Features:
+ - Reading speed and letter spacing customization
+ - Can load text from a textbox or from file (complex formats like PDFs and Word are not supported currently)
+ - Easily preview text and jump to specific positions in the text
+ - "Center focus" and "Bionic reading" modes
+     - "Center focus" mode (default) highlights a center-aligned letter to give a single point to focus on while reading
+     - "Bionic reading" mode attempts to emulate Bionic Reading fonts
 
 ## Development server
 

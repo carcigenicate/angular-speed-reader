@@ -1,6 +1,5 @@
 import { Component, ElementRef, output, viewChild } from '@angular/core';
 import { Button } from 'primeng/button';
-import { file } from '@primeuix/themes/aura/fileupload';
 
 @Component({
   selector: 'app-load-from-file',
