@@ -1,19 +1,16 @@
 import { Component, computed, ElementRef, HostBinding, OnInit, Signal, signal } from '@angular/core';
-import { WordCanvas } from '../word-canvas/word-canvas';
+import { FocusType, WordCanvas } from '../word-canvas/word-canvas';
 import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
-import { FileUpload } from 'primeng/fileupload';
 import { LoadFromFile } from '../util-components/load-from-file/load-from-file';
 import { Slider } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Dialog } from 'primeng/dialog';
 import { Divider } from 'primeng/divider';
 import { Textarea } from 'primeng/textarea';
-import { ProgressBar } from 'primeng/progressbar';
 import { PreviewProgressBar } from '../preview-progress-bar/preview-progress-bar.component';
-import { Accordion, AccordionHeader, AccordionPanel } from 'primeng/accordion';
+import { SelectButton } from 'primeng/selectbutton';
 
 const SAMPLE_TEXT = `
 dSo I posted here a few days ago asking for feedback on something I built. Got some honest responses that basically said "this already exists" and "just use Copilot for this." Which... fair enough.
@@ -51,27 +48,32 @@ Honest takes welcome
     Divider,
     Textarea,
     PreviewProgressBar,
+    SelectButton,
   ],
   templateUrl: './main-view.html',
   styleUrl: './main-view.scss',
 })
 export class MainView implements OnInit {
+  text: string = '';
   words: string[] = [];
   currentWordIndex: number = 0;
   whitespaceCombinedText: string = '';
 
   minWpm: number = 150;
   maxWpm: number = 900;
+  wordsPerMinute: Signal<number> = signal<number>(400);
 
   minSpacing: number = -40;
   maxSpacing: number = 40;
+  letterSpacing: Signal<number> = signal<number>(0);
+
+  focusType: Signal<FocusType> = signal<FocusType>('center');
 
   canvasWidth: number = 1800;
   canvasHeight: number = 300;
 
   currentWord = signal<string>('');
-  wordsPerMinute: Signal<number> = signal<number>(400);
-  letterSpacing: Signal<number> = signal<number>(0);
+
   advanceDelay: Signal<number>;
 
   isPaused: boolean = true;
@@ -79,6 +81,11 @@ export class MainView implements OnInit {
   importDialogShowing: boolean = false;
 
   textColor!: string;
+
+  focusTypeOptions: { label: string, value: FocusType }[] = [
+    { label: 'Center', value: 'center' },
+    { label: 'Bionic', value: 'bionic' },
+  ]
 
   constructor(
     private host: ElementRef,
@@ -122,6 +129,7 @@ export class MainView implements OnInit {
   }
 
   loadText(text: string) {
+    this.text = text;
     this.whitespaceCombinedText = text.replace(/\s+/g, ' ');
     this.words = this.whitespaceCombinedText.split(/\s/).filter((word) => word.length > 0);
     this.setCurrentWordByIndex(0);

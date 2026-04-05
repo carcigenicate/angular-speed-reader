@@ -1,6 +1,22 @@
-import { AfterViewInit, Component, effect, ElementRef, input, OnInit, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  input,
+  OnInit,
+  Signal,
+  signal,
+  viewChild
+} from '@angular/core';
 
-const MAX_FOCUS_INDEX = 4;
+export type FocusType = 'center' | 'bionic';
+
+const MAX_CENTER_FOCUS_INDEX = 4;
+
+const BIONIC_FOCUS_LENGTH = 4;
+const MIN_BIONIC_FOCUS_LENGTH = 4;
 
 @Component({
   selector: 'app-word-canvas',
@@ -11,33 +27,39 @@ const MAX_FOCUS_INDEX = 4;
 export class WordCanvas implements OnInit, AfterViewInit {
   word = input.required<string>()
   letterSpacing = input<number>(2);
-  font = input<string>('bold 200px Arial');
+  fontFamily = input<string>('monospace');
 
   width = input.required<number>();
   height = input.required<number>();
 
-  mainCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('mainCanvas');
+  focusType = input.required<FocusType>();
 
   normalTextStyle = input<string>('black');
-  focusTextStyle = input<string>('red');
+  centerFocusTextStyle = input<string>('red');
   backgroundStyle = input<string>('white');
+
+  mainCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('mainCanvas');
+
+  fontSize: Signal<number>;
+  centerFocusFont: Signal<string>;
 
   constructor(
   ) {
     effect(() => {
       const word = this.word();
       this.writeWord(word);
+    });
+
+    this.fontSize = computed(() => {
+      return this.height() * (2/3);
     })
-  }
 
-  focusIndex(length: number) {
-    let index = 0;
+    this.centerFocusFont = computed(() => {
+      const family = this.fontFamily();
+      const fontSize = this.fontSize();
 
-    if (length > 2) {
-      index = Math.floor(length / 2);
-    }
-
-    return Math.min(MAX_FOCUS_INDEX, index);
+      return `normal ${fontSize}px ${family}`;
+    });
   }
 
   ngOnInit() {
@@ -49,18 +71,43 @@ export class WordCanvas implements OnInit, AfterViewInit {
   }
 
   writeWord(word: string) {
-    const ctx = this.ctx;
+    const focusType = this.focusType();
 
-    ctx.save();
+    if (focusType == 'center') {
+      this.writeWordWithCenterFocus(word);
+    } else {
+      this.writeWordWithBionicFocus(word);
+    }
+  }
 
-    ctx.font = this.font();
+  private commonCanvasSetup(ctx: CanvasRenderingContext2D) {
     ctx.textBaseline = 'middle';
     ctx.letterSpacing = `${this.letterSpacing()}px`;
 
     ctx.fillStyle = this.backgroundStyle();
     ctx.fillRect(0, 0, this.width(), this.height());
+  }
 
-    const focusIndex = this.focusIndex(word.length);
+  private centerFocusIndex(length: number) {
+    let index = 0;
+
+    if (length > 2) {
+      index = Math.floor(length / 2);
+    }
+
+    return Math.min(MAX_CENTER_FOCUS_INDEX, index);
+  }
+
+  writeWordWithCenterFocus(word: string) {
+    const ctx = this.ctx;
+
+    ctx.save();
+
+    ctx.font = this.centerFocusFont();
+
+    this.commonCanvasSetup(ctx);
+
+    const focusIndex = this.centerFocusIndex(word.length);
 
     const firstHalf = word.slice(0, focusIndex);
     const firstHalfMetrics  = ctx.measureText(firstHalf);
@@ -78,11 +125,57 @@ export class WordCanvas implements OnInit, AfterViewInit {
     ctx.fillStyle = this.normalTextStyle();
     ctx.fillText(firstHalf, focusStartX - firstHalfMetrics.width - this.letterSpacing(), halfHeight);
 
-    ctx.fillStyle = this.focusTextStyle();
+    ctx.fillStyle = this.centerFocusTextStyle();
     ctx.fillText(focusLetter, focusStartX, halfHeight);
 
     ctx.fillStyle = this.normalTextStyle();
     ctx.fillText(secondHalf, focusStartX + focusMetrics.width + this.letterSpacing(), halfHeight);
+
+    ctx.restore();
+  }
+
+  private bionicFocusIndex(length: number) {
+    if (length <= MIN_BIONIC_FOCUS_LENGTH) {
+      return MIN_BIONIC_FOCUS_LENGTH;
+    } else {
+      return BIONIC_FOCUS_LENGTH;
+    }
+  }
+
+  writeWordWithBionicFocus(word: string) {
+    const ctx = this.ctx;
+
+    ctx.save();
+
+    const bionicFocusFont = `900 ${this.fontSize()}px ${this.fontFamily()}`;
+    const normalFont = `100 ${this.fontSize()}px ${this.fontFamily()}`;
+
+    this.commonCanvasSetup(ctx);
+
+    ctx.save();
+    ctx.font = bionicFocusFont;
+    const boldedWordMetrics = ctx.measureText(word);
+    ctx.restore();
+
+    const focusIndex = this.bionicFocusIndex(word.length);
+
+    const firstHalf = word.slice(0, focusIndex);
+
+    const secondHalf = word.slice(focusIndex);
+
+    const halfWidth = this.width() / 2;
+    const halfHeight = this.height() / 2;
+
+    ctx.fillStyle = this.normalTextStyle();
+
+    ctx.font = bionicFocusFont;
+    const firstHalfMetrics  = ctx.measureText(firstHalf);
+    const firstStartX = halfWidth - (boldedWordMetrics.width / 2);
+    ctx.fillText(firstHalf, firstStartX, halfHeight);
+
+    ctx.font = normalFont;
+    const secondStartX = firstStartX + firstHalfMetrics.width + this.letterSpacing();
+    ctx.fillText(secondHalf, secondStartX, halfHeight);
 
     ctx.restore();
   }

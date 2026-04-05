@@ -18,6 +18,7 @@
           #textArea
           pTextarea
           [rows]="10"
+          [ngModel]="text.length < 5000 ? text : ''"
         ></textarea>
 
         <p-button
@@ -83,11 +84,12 @@
   <app-word-canvas
     [width]="canvasWidth"
     [height]="canvasHeight"
-    font="bold 200px monospace"
+    fontFamily="monospace"
     [letterSpacing]="letterSpacing()"
     [normalTextStyle]="textColor"
     backgroundStyle="black"
     [word]="currentWord()"
+    [focusType]="focusType()"
   />
 
   <p-divider />
@@ -138,6 +140,19 @@
                 [min]="minSpacing"
                 [max]="maxSpacing"
               />
+            </td>
+          </tr>
+          <tr>
+            <td>Focus Type</td>
+            <td>
+              <p-select-button
+                [options]="focusTypeOptions"
+                [(ngModel)]="focusType"
+
+              />
+            </td>
+            <td>
+              <!-- TODO: Settings that depend on type, like number of prefix to bold -->
             </td>
           </tr>
           </tbody>
